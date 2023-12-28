@@ -7,6 +7,7 @@ import {
   TextInput,
   ScrollView,
   Alert,
+  Platform,
 } from "react-native";
 import { Fontisto } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -47,22 +48,32 @@ export default function App() {
     setText("");
   };
   const deleteToDo = (key) => {
-    Alert.alert(
-      "정말로 삭제하시겠습니까?",
-      "삭제 버튼 클릭 시 바로 삭제됩니다.",
-      [
-        { text: "취소" },
-        {
-          text: "삭제",
-          onPress: async () => {
-            const newToDos = { ...toDos };
-            delete newToDos[key];
-            setToDos(newToDos);
-            await saveToDos(newToDos);
+    if (Platform.OS === "web") {
+      const ok = confirm("정말로 삭제하시겠습니까?");
+      if (ok) {
+        const newToDos = { ...toDos };
+        delete newToDos[key];
+        setToDos(newToDos);
+        saveToDos(newToDos);
+      }
+    } else {
+      Alert.alert(
+        "정말로 삭제하시겠습니까?",
+        "삭제 버튼 클릭 시 바로 삭제됩니다.",
+        [
+          { text: "취소" },
+          {
+            text: "삭제",
+            onPress: async () => {
+              const newToDos = { ...toDos };
+              delete newToDos[key];
+              setToDos(newToDos);
+              await saveToDos(newToDos);
+            },
           },
-        },
-      ]
-    );
+        ]
+      );
+    }
   };
   return (
     <View style={styles.container}>
